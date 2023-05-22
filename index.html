@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Email Extractor</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    
+  <div class="container mt-5">
+    <h1>Search Your Result</h1>
+    <div class="form-group">
+      <!-- <label for="urlInput">URL:</label> -->
+      <input type="text" class="form-control col-md-8" id="urlInput" placeholder="Enter URL">
+    </div>
+    <button type="button" class="btn btn-secondary rounded-pill" onclick="fetchEmails()">Fetch Emails</button>
+    <div id="result" class="mt-3"></div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+   function fetchEmails() {
+  var url = document.getElementById("urlInput").value;
+  var resultDiv = document.getElementById("result");
+  resultDiv.innerHTML = "";  // Clear previous results
+
+  if (url) {
+    var maxRetries = 3;
+    var retryCount = 0;
+
+    var fetchEmailsInternal = function() {
+      $.ajax({
+        url: "fetch_emails",
+        type: "POST",
+        data: {url: url},
+        success: function(data) {
+          resultDiv.innerHTML = data;
+        },
+        error: function() {
+          if (retryCount < maxRetries) {
+            retryCount++;
+            fetchEmailsInternal();  // Retry the request
+          } else {
+            resultDiv.innerHTML = "Failed to fetch emails.";
+          }
+        }
+      });
+    };
+
+    fetchEmailsInternal();
+  }
+}
+
+  </script>
+</body>
+</html>
